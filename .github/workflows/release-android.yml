@@ -1,0 +1,54 @@
+name: Publicar APK (Android)
+
+# Gera o APK na nuvem do Expo (EAS) e anexa em uma Release do GitHub.
+# Para rodar: crie uma tag, por exemplo   git tag v1.0.0 && git push origin v1.0.0
+# Requer o segredo EXPO_TOKEN (veja o README, seção "Publicar uma versão").
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar APK no EAS
+        run: eas build --platform android --profile preview --non-interactive --json > build.json
+
+      - name: Baixar o APK
+        run: |
+          URL=$(jq -r '.[0].artifacts.buildUrl' build.json)
+          if [ -z "$URL" ] || [ "$URL" = "null" ]; then
+            echo "Não encontrei o link do APK no resultado do build:"; cat build.json; exit 1
+          fi
+          NOME="GymLife-${GITHUB_REF_NAME}.apk"
+          curl -L --fail -o "$NOME" "$URL"
+          echo "APK_FILE=$NOME" >> "$GITHUB_ENV"
+
+      - name: Criar Release com o APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$APK_FILE" \
+            --title "GymLife $GITHUB_REF_NAME" \
+            --generate-notes

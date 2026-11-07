@@ -39,3 +39,21 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# --- GymLife ---
+# Segredos e configuração local (use .env.example como modelo)
+.env
+.env.*
+!.env.example
+
+# Binários de build
+*.apk
+*.aab
+*.ipa
+
+# Saída do export web
+dist/
+
+# Configurações locais de editor/ferramentas
+.claude/
+.vscode/
