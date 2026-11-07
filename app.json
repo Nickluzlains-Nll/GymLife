@@ -20,7 +20,10 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.gymlife.app"
+      "package": "com.gymlife.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +37,12 @@
           "photosPermission": "O GymLife precisa acessar suas fotos para você escolher a foto de perfil."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "63156e96-d555-42c2-b652-eabcc26d593b"
+      }
+    },
+    "owner": "nicolasluzlains"
   }
 }
