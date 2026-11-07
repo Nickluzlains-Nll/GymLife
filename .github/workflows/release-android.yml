@@ -49,6 +49,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "$APK_FILE" \
-            --title "GymLife $GITHUB_REF_NAME" \
-            --generate-notes
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            # A release já existe (por exemplo, criada pelo site): só anexa/atualiza o APK.
+            gh release upload "$GITHUB_REF_NAME" "$APK_FILE" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$APK_FILE" \
+              --title "GymLife $GITHUB_REF_NAME" \
+              --generate-notes
+          fi
